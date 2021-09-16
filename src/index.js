@@ -34,6 +34,86 @@ devs.post('/produto', async (req,resp) => {
         return resp.send({erro:"O campo nome precisa ter mais do que 4 caracteres"})  
        
    
+        if (pro.precoD < 0 )
+        return resp.send({erro:"O preço não pode ser negativo"})    
+      
+
+        if (pro.precoP < 0 )
+        return resp.send({erro:"O preço não pode ser negativo"})   
+        
+
+         if (isNaN(pro.precoP) ) {return resp.send({erro: 'Letras não podem ser utilizadas no preço por'})};
+       
+        
+        if (isNaN(pro.precoD) ) {return resp.send({erro:'Letras não podem ser utilizadas no preço de'})}; 
+      
+
+        if (!pro.cat || pro.cat.replace === '')
+        return resp.send({erro:"A categoria é obrigatória"}) 
+      
+   
+        if (!pro.ava || pro.ava.replace === '')
+        return resp.send({erro: "A avaliação é obrigatória"}) 
+
+        
+        if (pro.ava != parseInt(pro.ava))
+            return resp.send({erro:'Letras não podem ser utilizadas no campo avaliação'});
+      
+
+        if (!pro.est || pro.est.replace === '')
+        return resp.send({erro: "O estoque é obrigatório"}) 
+        
+        
+        if (pro.est != parseInt(pro.est))
+            return resp.send({erro:'Letras não podem ser utilizadas no campo estoque'});
+        
+
+        if (!pro.img || pro.img.replace === '')
+        return resp.send({erro: "O link da imagem é obrigatório"}) 
+
+        if (!pro.des || pro.des.replace === '')
+        return resp.send({erro: "A descrição é obrigatória"}) 
+    
+
+         let p = await db.tb_produto.findOne({where: {nm_produto: pro.nome}})
+         if (p != null)
+         return resp.send({erro: "O produto já foi cadastrado"})
+        
+        
+        let u  = await db.tb_produto.create({
+            nm_produto: pro.nome,
+            vl_preco_de: pro.precoD, 
+            ds_categoria: pro.cat, 
+            vl_preco_por: pro.precoP, 
+            vl_avaliacao: pro.ava, 
+            ds_produto: pro.des, 
+            qtd_estoque: pro.est,
+            img_produto: pro.img,
+            bt_ativo:pro.ativo,
+            dt_inclusao: data
+
+        }) 
+
+        resp.send(u);
+       } catch(e) {resp.send (e.toString())}
+})
+
+
+
+devs.put('/produto/:id', async (req,resp) =>{
+    try{
+        let id = req.params.id;
+        let pro = req.body;
+
+
+        
+        if (!pro.nome || pro.nome.replace === '' )
+        return resp.send({erro: "O nome do produto é obrigatório"})
+   
+        if ( pro.nome.length <= 4)
+        return resp.send({erro:"O campo nome precisa ter mais do que 4 caracteres"})  
+       
+   
         if (pro.preD < 0 )
         return resp.send({erro:"O preço não pode ser negativo"})    
       
@@ -70,46 +150,18 @@ devs.post('/produto', async (req,resp) => {
         return resp.send({erro: "O link da imagem é obrigatório"}) 
        
 
-    
 
-         let p = await db.tb_produto.findOne({where: {nm_produto: pro.nome, ds_categoria: pro.cat, vl_preco_de: pro.precoD, vl_preco_por: pro.precoP, vl_avaliacao: pro.ava, ds_produto: pro.des, qtd_estoque: pro.est,img_produto: pro.img }})
-         if (p != null)
-         return resp.send({erro: "O produto já foi cadastrado"})
-        
-        let u  = await db.tb_produto.create({
-            nm_produto: pro.nome,
-            vl_preco_de: pro.precoD, 
-            ds_categoria: pro.cat, 
-            vl_preco_por: pro.precoP, 
-            vl_avaliacao: pro.ava, 
-            ds_produto: pro.des, 
-            qtd_estoque: pro.est,
-            img_produto: pro.img,
-            bt_ativo:pro.ativo,
-            dt_inclusao: data
-
-        })
-        resp.send(u);
-       } catch(e) {resp.send ({erro: 'Ocorreu um erro, o produto não foi cadastrado'})}
-})
-
-
-
-devs.put('/produto/:id', async (req,resp) =>{
-    try{
-        let id = req.params.id;
-        let d = req.body;
 
         let dut = await db.tb_produto.update(
             {
-                nm_produto: d.nome,
-                ds_categoria: d.cat, 
-                vl_preco_de: d.precoD, 
-                vl_preco_por: d.precoP, 
-                vl_avaliacao: d.ava, 
-                ds_produto: d.des, 
-                qtd_estoque: d.est,
-                img_produto: d.img
+                nm_produto: pro.nome,
+                ds_categoria: pro.cat, 
+                vl_preco_de: pro.precoD, 
+                vl_preco_por: pro.precoP, 
+                vl_avaliacao: pro.ava, 
+                ds_produto: pro.des, 
+                qtd_estoque: pro.est,
+                img_produto: pro.img
             },
             {
                 where: {id_produto: id}

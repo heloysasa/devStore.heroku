@@ -9,7 +9,7 @@ devs.use(express.json());
 
 devs.get('/produto', async (req,resp) => {
     try{
-        let produtos = await db.tb_produto.findAll()
+        let produtos = await db.tb_produto.findAll({order: [["id_produto", "desc"]]})
         resp.send(produtos);
     } catch (e){
         resp.send({erro: "Não foi possível consultar os produtos"})

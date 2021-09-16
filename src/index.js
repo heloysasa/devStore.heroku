@@ -122,12 +122,10 @@ devs.put('/produto/:id', async (req,resp) =>{
         return resp.send({erro:"O preço não pode ser negativo"})   
         
 
-        if (pro.preP === NaN)
-        return toast.error('Letras não podem ser utilizadas no preço');
+        if (isNaN(pro.precoP) ) {return resp.send({erro: 'Letras não podem ser utilizadas no preço por'})};
        
-
-        if (pro.preD === NaN)
-        return resp.send({erro:"Letras não podem ser utilizadas no preço"})   
+        
+        if (isNaN(pro.precoD) ) {return resp.send({erro:'Letras não podem ser utilizadas no preço de'})}; 
       
 
         if (!pro.cat || pro.cat.replace === '')

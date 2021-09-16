@@ -4,7 +4,7 @@ import cors from 'cors'
 
 const devs = express(); 
 devs.use(cors());
-
+devs.use(express.json());
 
 
 devs.get('/produto', async (req,resp) => {
@@ -18,27 +18,79 @@ devs.get('/produto', async (req,resp) => {
 
 
 devs.post('/produto', async (req,resp) => {
-    try {
-        let pro = req.body;
 
-        let p = await db.tb_produto.findOne({where: {nm_produto: pro.produto, ds_categoria: pro.categoria, vl_preco_de: pro.vl_preco_de, vl_preco_por: pro.vl_preco_por, vl_avaliacao: pro.vl_avaliacao, ds_produto: pro.descricao_produto, qtd_estoque: pro.qtd_estoque,img_produto: pro.img, bt_ativo: pro.ativo, dt_inclusao: pro.dt_inclusao }})
-        if (p != null)
-        return resp.send({erro: "O produto já foi cadastrado"})
+
+    try {
+        
+        let pro = req.body;
+        let data = new Date();
+
+
+
+        if (!pro.nome || pro.nome.replace === '' )
+        return resp.send({erro: "O nome do produto é obrigatório"})
+   
+        if ( pro.nome.length <= 4)
+        return resp.send({erro:"O campo nome precisa ter mais do que 4 caracteres"})  
+       
+   
+        if (pro.preD < 0 )
+        return resp.send({erro:"O preço não pode ser negativo"})    
+      
+
+        if (pro.preP < 0 )
+        return resp.send({erro:"O preço não pode ser negativo"})   
+        
+
+        if (pro.preP === NaN)
+        return toast.error('Letras não podem ser utilizadas no preço');
+       
+
+        if (pro.preD === NaN)
+        return resp.send({erro:"Letras não podem ser utilizadas no preço"})   
+      
+
+        if (!pro.cat || pro.cat.replace === '')
+        return resp.send({erro:"A categoria é obrigatória"}) 
+      
+   
+        if (!pro.ava || pro.ava.replace === '')
+        return resp.send({erro: "A avaliação é obrigatória"}) 
+      
+
+        if (!pro.est || pro.est.replace === '')
+        return resp.send({erro: "O estoque é obrigatório"}) 
+        
+
+        if (pro.est === NaN)
+        return resp.send({erro: "Letras não podem ser utilizadas no estoque"})
+        
+
+        if (!pro.img || pro.img.replace === '')
+        return resp.send({erro: "O link da imagem é obrigatório"}) 
+       
+
+    
+
+         let p = await db.tb_produto.findOne({where: {nm_produto: pro.nome, ds_categoria: pro.cat, vl_preco_de: pro.precoD, vl_preco_por: pro.precoP, vl_avaliacao: pro.ava, ds_produto: pro.des, qtd_estoque: pro.est,img_produto: pro.img }})
+         if (p != null)
+         return resp.send({erro: "O produto já foi cadastrado"})
         
         let u  = await db.tb_produto.create({
-            nm_produto: pro.produto,
-            ds_categoria: pro.categoria, 
-            vl_preco_de: pro.preco_de, 
-            vl_preco_por: pro.preco_por, 
-            vl_avaliacao: pro.avaliacao, 
-            ds_produto: pro.descricao_produto, 
-            qtd_estoque: pro.estoque,
-            img_produto: pro.img, 
-            bt_ativo: pro.ativo,
-             dt_inclusao: pro.dt_inclusao
+            nm_produto: pro.nome,
+            vl_preco_de: pro.precoD, 
+            ds_categoria: pro.cat, 
+            vl_preco_por: pro.precoP, 
+            vl_avaliacao: pro.ava, 
+            ds_produto: pro.des, 
+            qtd_estoque: pro.est,
+            img_produto: pro.img,
+            bt_ativo:pro.ativo,
+            dt_inclusao: data
+
         })
         resp.send(u);
-       } catch(e) {resp.send ({erro: 'Ocorreu um erro, o produto não foi cadastrado!'})}
+       } catch(e) {resp.send ({erro: 'Ocorreu um erro, o produto não foi cadastrado'})}
 })
 
 
@@ -50,15 +102,14 @@ devs.put('/produto/:id', async (req,resp) =>{
 
         let dut = await db.tb_produto.update(
             {
-                nm_produto: pro.produto,
-                ds_categoria: pro.categoria, 
-                vl_preco_de: pro.vl_preco_de, 
-                vl_preco_por: pro.vl_preco_por, 
-                vl_avaliacao: pro.vl_avaliacao, 
-                ds_produto: pro.descricao_produto, 
-                qtd_estoque: pro.qtd_estoque,
-                img_produto: pro.img, 
-                dt_inclusao: pro.dt_inclusao
+                nm_produto: d.nome,
+                ds_categoria: d.cat, 
+                vl_preco_de: d.precoD, 
+                vl_preco_por: d.precoP, 
+                vl_avaliacao: d.ava, 
+                ds_produto: d.des, 
+                qtd_estoque: d.est,
+                img_produto: d.img
             },
             {
                 where: {id_produto: id}

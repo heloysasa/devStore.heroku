@@ -9,4 +9,5 @@ import Sequelize from 'sequelize'; const sequelize = new Sequelize(  
         logging: false 
     });
 
-const db = initdb(sequelize); export default db;
+const db = initdb(sequelize); 
+export default db;
